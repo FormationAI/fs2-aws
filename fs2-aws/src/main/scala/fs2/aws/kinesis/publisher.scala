@@ -1,6 +1,7 @@
 package fs2.aws.kinesis
 
 import java.nio.ByteBuffer
+import java.util.concurrent.Executor
 
 import cats.Monad
 import cats.effect.{Concurrent, Effect}
@@ -32,6 +33,10 @@ object publisher {
     ec: ExecutionContext,
     concurrent: Concurrent[F]): Pipe[F, (String, ByteBuffer), UserRecordResult] = {
 
+    val exec = new Executor {
+      def execute(command: Runnable) = ec.execute(command)
+    }
+
     // Evaluate the operation of invoking the Kinesis client
     def write: Pipe[F, (String, ByteBuffer), ListenableFuture[UserRecordResult]] =
       _.flatMap {
@@ -51,7 +56,7 @@ object publisher {
 
                 override def onSuccess(result: UserRecordResult): Unit = cb(Right(result))
               },
-              (command: Runnable) => ec.execute(command)
+              exec
             )
           }
       }

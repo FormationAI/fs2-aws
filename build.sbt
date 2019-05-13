@@ -3,6 +3,9 @@ organization in ThisBuild := "io.github.dmateusp"
 
 scalaVersion := "2.12.8"
 
+val desiredScalaVersions = settingKey[List[String]]("The List of Scala versions used for cross-building.")
+desiredScalaVersions in ThisBuild := List("2.11.12", scalaVersion.value)
+
 scalacOptions in ThisBuild ++= Seq(
   "-encoding",
   "UTF-8", // source files are in UTF-8
@@ -15,20 +18,35 @@ scalacOptions in ThisBuild ++= Seq(
   "-Xfatal-warnings", // turn compiler warnings into errors
   "-Ypartial-unification" // allow the compiler to unify type constructors of different arities
 )
+
 lazy val root = (project in file("."))
   .aggregate(`fs2-aws`, `fs2-aws-testkit`)
   .settings(
+    crossScalaVersions := Nil,
     skip in publish := true
   )
 
 lazy val `fs2-aws`         = (project in file("fs2-aws"))
+  .settings(
+    crossScalaVersions := desiredScalaVersions.value,
+    artifact in (Compile, packageBin) := {
+      val previous: Artifact = (artifact in (Compile, packageBin)).value
+      previous.withClassifier("form")
+    } 
+  )
 lazy val `fs2-aws-testkit` = (project in file("fs2-aws-testkit")).dependsOn(`fs2-aws`)
+  .settings(
+    crossScalaVersions := desiredScalaVersions.value
+  )
 
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")
 
-// publish
-publishTo in ThisBuild := Some(
-  "Sonatype Nexus" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
+// publishing
+val formationReleases: Resolver = "Formation Releases" at "s3://mvn.takt.com/releases"
+val formationSnapshots: Resolver = "Formation Snapshots" at "s3://mvn.takt.com/snapshots"
+
+resolvers ++= Seq(formationReleases, formationSnapshots)
+publishTo in ThisBuild := Some(if (isSnapshot.value) formationSnapshots else formationReleases)
 
 licenses in ThisBuild := Seq(
   "MIT" -> url("https://github.com/dmateusp/fs2-aws/blob/master/LICENSE"))
