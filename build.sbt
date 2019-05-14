@@ -43,13 +43,9 @@ lazy val `fs2-aws-testkit` = (project in file("fs2-aws-testkit")).dependsOn(`fs2
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")
 
 // publishing
-val formationReleases: Resolver = "Formation Releases" at "mvn.takt.com/releases"
-val formationSnapshots: Resolver = "Formation Snapshots" at "mvn.takt.com/snapshots"
-
-resolvers ++= Seq(formationReleases, formationSnapshots)
-publishTo := {
+publishTo in ThisBuild := {
   val prefix = if (isSnapshot.value) "snapshots" else "releases"
-  Some(s3resolver.value(s"Formation ${prefix} S3 bucket", s3(if (isSnapshot.value) formationSnapshots.toString else formationReleases.toString)))
+  Some(s3resolver.value(s"Formation ${prefix} S3 bucket", s3(if (isSnapshot.value) "mvn.takt.com/snapshots" else "mvn.takt.com/releases")))
 }
 
 licenses in ThisBuild := Seq(
