@@ -10,5 +10,4 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.10")
 addSbtPlugin("com.jsuereth"      % "sbt-pgp"     % "1.1.1")
 
 // Formation S3 publishing
-resolvers += Resolver.jcenterRepo
-addSbtPlugin("ohnosequences" % "sbt-s3-resolver" % "0.19.0")
+addSbtPlugin("com.frugalmechanic" % "fm-sbt-s3-resolver" % "0.18.0")
