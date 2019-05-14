@@ -16,7 +16,8 @@ scalacOptions in ThisBuild ++= Seq(
   "-language:implicitConversions", // allow use of implicit conversions
   "-Xlint", // enable handy linter warnings
   "-Xfatal-warnings", // turn compiler warnings into errors
-  "-Ypartial-unification" // allow the compiler to unify type constructors of different arities
+  "-Ypartial-unification", // allow the compiler to unify type constructors of different arities
+  "-target:jvm-1.8"         // Needed for calling static methods on interfaces, which AWS SDK 2.x needs
 )
 
 lazy val root = (project in file("."))
