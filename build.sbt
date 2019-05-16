@@ -30,10 +30,6 @@ lazy val root = (project in file("."))
 lazy val `fs2-aws`         = (project in file("fs2-aws"))
   .settings(
     crossScalaVersions := desiredScalaVersions.value,
-    artifact in (Compile, packageBin) := {
-      val previous: Artifact = (artifact in (Compile, packageBin)).value
-      previous.withClassifier(Some("form"))
-    }
   )
 lazy val `fs2-aws-testkit` = (project in file("fs2-aws-testkit")).dependsOn(`fs2-aws`)
   .settings(
@@ -45,7 +41,7 @@ addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")
 // publishing
 publishTo in ThisBuild := {
   val prefix = if (isSnapshot.value) "snapshots" else "releases"
-  Some(Resolver.url(s"Formation ${prefix} S3 bucket", url(if (isSnapshot.value) "s3://mvn.takt.com/snapshots" else "s3://mvn.takt.com/releases"))(Resolver.ivyStylePatterns))
+  Some(Resolver.url(s"Formation ${prefix} S3 bucket", url(if (isSnapshot.value) "s3://mvn.takt.com/snapshots" else "s3://mvn.takt.com/releases")))
 }
 
 licenses in ThisBuild := Seq(
